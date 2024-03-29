@@ -2,14 +2,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace BitChopp;
 
-public class ConfigService
+public class ConfigService(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public ConfigService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+    private readonly IConfiguration _configuration = configuration;
 
     public string? GetApiKey()
     {

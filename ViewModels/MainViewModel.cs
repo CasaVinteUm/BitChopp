@@ -14,6 +14,7 @@ using Views;
 public class MainViewModel : ReactiveObject
 {
     public ObservableCollection<Switch> Switches { get; } = [];
+    public string? DeviceId { get; private set; }
 
     public ICommand SwitchCommand { get; }
 
@@ -24,7 +25,7 @@ public class MainViewModel : ReactiveObject
         _ = LoadSwitchesAsync(apiService);
     }
 
-    private void OnSwitchSelected(SwitchComandObject swObj)
+    private async void OnSwitchSelected(SwitchComandObject swObj)
     {
         if (swObj.Switch == null || string.IsNullOrEmpty(swObj.Switch.Lnurl))
         {
@@ -35,9 +36,12 @@ public class MainViewModel : ReactiveObject
         Console.WriteLine($"Selected Switch's Lnurl: {swObj.Switch.Lnurl}");
 
         var qrWindow = new QRCodeWindow();
-        qrWindow.SetQRCode(swObj.Switch.Lnurl); // Assuming switch.Lnurl contains the URL for the QR code
-        qrWindow.ShowDialog(swObj.Window);
+        qrWindow.SetData(DeviceId, swObj.Switch.Lnurl); // Assuming switch.Lnurl contains the URL for the QR code
+        var task = qrWindow.ShowDialog(swObj.Window);
         qrWindow.Topmost = true; // Make the window always on top
+        await task;
+
+        var result = qrWindow.WebSocketResult;
     }
 
     private async Task LoadSwitchesAsync(ApiService apiService)
@@ -48,6 +52,8 @@ public class MainViewModel : ReactiveObject
             // Handle error
             return;
         }
+
+        DeviceId = responseItems[0].Id;
 
         UpdateUI(responseItems[0].Switches!);
     }
