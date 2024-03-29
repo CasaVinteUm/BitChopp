@@ -13,23 +13,22 @@ public partial class QRCodeWindow : Window
 {
     private readonly ClientWebSocket _webSocket = new();
 
-    private string? _deviceId;
+    private readonly string _deviceId;
+    private readonly int _pinId;
+    private readonly string _lnUrl;
 
     public string? WebSocketResult { get; private set; }
 
-    public QRCodeWindow()
+    public QRCodeWindow(string deviceId, int pinId, string lnUrl, ConfigService configService)
     {
         InitializeComponent();
 
-        OpenWebSocketAsync();
-    }
-
-    public void SetData(string id, string url)
-    {
-        _deviceId = id;
+        _deviceId = deviceId;
+        _pinId = pinId;
+        _lnUrl = lnUrl;
 
         var qrGenerator = new QRCodeGenerator();
-        var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.L);
+        var qrCodeData = qrGenerator.CreateQrCode(_lnUrl, QRCodeGenerator.ECCLevel.L);
         var qrCode = new PngByteQRCode(qrCodeData);
 
         var qrCodeImage = qrCode.GetGraphic(20);
@@ -37,6 +36,18 @@ public partial class QRCodeWindow : Window
 
         var bitmap = new Avalonia.Media.Imaging.Bitmap(ms);
         QrCodeImage.Source = bitmap;
+
+        var isKiosk = configService.IsKiosk();
+        if (isKiosk) {
+            WindowState = WindowState.FullScreen;
+            ExtendClientAreaToDecorationsHint = true;
+            ExtendClientAreaTitleBarHeightHint = -1d;
+            SystemDecorations = SystemDecorations.None;
+            ShowInTaskbar = false;
+            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None);
+        }
+
+        Dispatcher.UIThread.InvokeAsync(() => OpenWebSocketAsync());
     }
 
     private void CloseDialog(object sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -63,16 +74,28 @@ public partial class QRCodeWindow : Window
         while (_webSocket.State == WebSocketState.Open)
         {
             var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            if (result.MessageType == WebSocketMessageType.Text)
-            {
-                var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                // Handle the message
-                WebSocketResult = message;
-
-                Close();
-
-                break; // Close after receiving the first message
+            if (result.MessageType != WebSocketMessageType.Text) {
+                Console.WriteLine("Received non-text WebSocket message.");
+                continue;
             }
+
+            var message = Encoding.UTF8.GetString(buffer, 0, result.Count).Split('-');
+
+            var pin = int.Parse(message[0]);
+            var duration = int.Parse(message[1]);
+
+            // TODO: Check PIN id; message = pinId-duration
+            if(pin != _pinId) {
+                Console.Error.WriteLine("Invalid PIN. Someone probably paid old invoice");
+                return;
+            }
+
+            WebSocketResult = "Paid";
+
+            _ = _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+
+            Close();
+            return;
         }
     }
 }

@@ -8,12 +8,7 @@
         x:Class="BitChopp.Views.MainWindow"
         Title="BitChopp - Casa21"
         Background="Black"
-        WindowStartupLocation="CenterScreen"
-        WindowState="FullScreen"
-        ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaTitleBarHeightHint="-1"
-        SystemDecorations="None"
-        ShowInTaskbar="False">
+        WindowStartupLocation="CenterScreen">
   <Window.Styles>
     <!-- Specific style for TextBlock -->
     <Style Selector="TextBlock">

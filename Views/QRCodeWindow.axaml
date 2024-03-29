@@ -6,12 +6,7 @@
         x:Class="BitChopp.Views.QRCodeWindow"
         Title="BitChopp - Casa21 - Pay!"
         Background="Black"
-        WindowStartupLocation="CenterScreen"
-        WindowState="FullScreen"
-        SystemDecorations="None"
-        ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaTitleBarHeightHint="-1"
-        ShowInTaskbar="False">
+        WindowStartupLocation="CenterScreen">
   <Window.Styles>
     <!-- Specific style for Button -->
     <Style Selector="Button">

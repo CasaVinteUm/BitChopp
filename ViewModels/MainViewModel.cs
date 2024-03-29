@@ -18,6 +18,7 @@ public class MainViewModel : ReactiveObject
     public ObservableCollection<LnUrlPosSwitch> Switches { get; } = [];
 
     public readonly string DeviceId;
+    private readonly ConfigService _configService;
 
     public ICommand SwitchCommand { get; }
 
@@ -27,6 +28,7 @@ public class MainViewModel : ReactiveObject
 
         DeviceId = configService.GetSwitchId();
         _ = LoadSwitchesAsync(apiService);
+        _configService = configService;
     }
 
     private async void OnSwitchSelected(SwitchCommandObject swObj)
@@ -39,13 +41,14 @@ public class MainViewModel : ReactiveObject
         // Logic to handle switch selection, such as navigating to a new screen and displaying the QR code
         Console.WriteLine($"Selected Switch's Lnurl: {swObj.Switch.Lnurl}");
 
-        var qrWindow = new QRCodeWindow();
-        qrWindow.SetData(DeviceId, swObj.Switch.Lnurl); // Assuming switch.Lnurl contains the URL for the QR code
+        var qrWindow = new QRCodeWindow(DeviceId, swObj.Switch.Pin, swObj.Switch.Lnurl, _configService);
         var task = qrWindow.ShowDialog(swObj.Window);
         qrWindow.Topmost = true; // Make the window always on top
         await task;
 
         var result = qrWindow.WebSocketResult;
+        
+        // TODO: Enable GPIO pin to release the beer
     }
 
     private async Task LoadSwitchesAsync(ApiService apiService)

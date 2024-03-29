@@ -24,4 +24,9 @@ public class ConfigService(IConfiguration configuration)
 
         return new Uri(host);
     }
+
+    public bool IsKiosk()
+    {
+        return _configuration["IsKiosk"] == "1" || _configuration["IsKiosk"]?.ToLowerInvariant() == "true";
+    }
 }

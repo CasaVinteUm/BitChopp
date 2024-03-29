@@ -29,6 +29,7 @@ public partial class App : Application
         Console.WriteLine($"LnBitsHost: {ConfigService?.GetLnBitsHost()}");
         Console.WriteLine($"Your API Key: {ConfigService?.GetApiKey()}");
         Console.WriteLine($"Switch ID: {ConfigService?.GetSwitchId()}");
+        Console.WriteLine($"IsKiosk: {ConfigService?.IsKiosk()}");
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -42,7 +43,7 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
+            desktop.MainWindow = new MainWindow(ConfigService)
             {
                 DataContext = new MainViewModel(apiService, ConfigService)
             };

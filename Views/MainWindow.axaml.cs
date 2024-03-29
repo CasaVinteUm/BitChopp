@@ -8,12 +8,19 @@ namespace BitChopp.Views;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(ConfigService configService)
     {
         InitializeComponent();
 
-        // Hide the cursor for this window
-        //Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None);
+        var isKiosk = configService.IsKiosk();
+        if (isKiosk) {
+            WindowState = WindowState.FullScreen;
+            ExtendClientAreaToDecorationsHint = true;
+            ExtendClientAreaTitleBarHeightHint = -1d;
+            SystemDecorations = SystemDecorations.None;
+            ShowInTaskbar = false;
+            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None);
+        }
     }
 
     private void OnSwitchButtonClick(object sender, RoutedEventArgs e)
