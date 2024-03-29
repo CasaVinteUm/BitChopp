@@ -13,6 +13,8 @@ public partial class App : Application
 {
     public IConfiguration? Configuration { get; private set; }
 
+    public ConfigService? ConfigService { get; private set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -22,21 +24,20 @@ public partial class App : Application
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
         Configuration = builder.Build();
+        ConfigService = new ConfigService(Configuration);
 
-        // Example of accessing the API key
-        var apiKey = Configuration["ApiKey"];
-        Console.WriteLine($"Your API Key: {apiKey}");
+        Console.WriteLine($"Your API Key: {ConfigService?.GetApiKey()}");
+        Console.WriteLine($"Switch ID: {ConfigService?.GetSwitchId()}");
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        if (Configuration == null)
+        if (Configuration == null || ConfigService == null)
         {
             throw new InvalidOperationException("Configuration is not initialized");
         }
 
-        var configService = new ConfigService(Configuration);
-        var apiService = new ApiService(configService);
+        var apiService = new ApiService(ConfigService);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

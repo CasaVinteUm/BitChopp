@@ -10,4 +10,9 @@ public class ConfigService(IConfiguration configuration)
     {
         return _configuration["ApiKey"];
     }
+
+    public string? GetSwitchId()
+    {
+        return _configuration["SwitchId"];
+    }
 }
