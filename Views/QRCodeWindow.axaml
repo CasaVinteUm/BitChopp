@@ -27,6 +27,6 @@
   </Window.Styles>
   <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
     <Image x:Name="QrCodeImage" Width="500" Height="500" Stretch="Uniform"/>
-    <Button Content="Cancelar" HorizontalAlignment="Center" Click="Close"/>
+    <Button Content="Cancelar" HorizontalAlignment="Center" Click="CloseDialog"/>
   </StackPanel>
 </Window>
