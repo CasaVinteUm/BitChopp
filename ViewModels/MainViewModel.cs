@@ -1,31 +1,35 @@
+using Avalonia.Controls;
+using DynamicData;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia.Controls;
-using ReactiveUI;
 
 namespace BitChopp.ViewModels;
 
+using Models;
 using Views;
 
 public class MainViewModel : ReactiveObject
 {
-    public ObservableCollection<Switch> Switches { get; } = [];
-    public string? DeviceId { get; private set; }
+    public ObservableCollection<LnUrlPosSwitch> Switches { get; } = [];
+
+    public readonly string DeviceId;
 
     public ICommand SwitchCommand { get; }
 
-    public MainViewModel(ApiService apiService)
+    public MainViewModel(ApiService apiService, ConfigService configService)
     {
-        SwitchCommand = ReactiveCommand.Create<SwitchComandObject>(OnSwitchSelected);
+        SwitchCommand = ReactiveCommand.Create<SwitchCommandObject>(OnSwitchSelected);
 
+        DeviceId = configService.GetSwitchId();
         _ = LoadSwitchesAsync(apiService);
     }
 
-    private async void OnSwitchSelected(SwitchComandObject swObj)
+    private async void OnSwitchSelected(SwitchCommandObject swObj)
     {
         if (swObj.Switch == null || string.IsNullOrEmpty(swObj.Switch.Lnurl))
         {
@@ -46,43 +50,32 @@ public class MainViewModel : ReactiveObject
 
     private async Task LoadSwitchesAsync(ApiService apiService)
     {
-        var responseItems = await apiService.FetchDataAsync() ?? throw new Exception("Failed to fetch data");
-        if (responseItems?.Count == 0 || responseItems?[0] == null || responseItems[0].Switches?.Count == 0)
+        var lnUrlPosDevices = (await apiService.FetchLnurlPos()) ?? throw new Exception("Failed to fetch data");
+
+        if (lnUrlPosDevices.Count == 0)
         {
-            // Handle error
+            Console.Error.WriteLine("Failed to fetch a valid list of lnurl devices");
             return;
         }
 
-        DeviceId = responseItems[0].Id;
+        var lnUrlDevice = lnUrlPosDevices.FirstOrDefault(r => r.Id?.ToString() == DeviceId) ?? throw new Exception("Could not find the device with the specified ID");
 
-        UpdateUI(responseItems[0].Switches!);
+        UpdateUI(lnUrlDevice.Switches);
     }
 
-    private void UpdateUI(List<Switch> switches)
+    private void UpdateUI(List<LnUrlPosSwitch> switches)
     {
         // Ensure UI updates happen on the UI thread
         Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
         {
             Switches.Clear();
-            switches = [.. switches.OrderBy(x => x.Amount)];
-            for (var i = 0; i < switches.Count; i++)
-            {
-                switches[i].Description = i switch
-                {
-                    0 => "Half Pint (284ml)",
-                    1 => "Pint (568ml)",
-                    2 => "Oktoberfest (1L)",
-                    _ => "Unknown",
-                };
-                Switches.Add(switches[i]);
-            }
-            // Trigger any other UI updates or notifications here
+            Switches.AddRange([.. switches.OrderBy(x => x.Amount)]);
         });
     }
 }
 
-public class SwitchComandObject(Window window, Switch switchItem)
+public class SwitchCommandObject(Window window, LnUrlPosSwitch switchItem)
 {
     public Window Window { get; set; } = window;
-    public Switch Switch { get; set; } = switchItem;
+    public LnUrlPosSwitch Switch { get; set; } = switchItem;
 }

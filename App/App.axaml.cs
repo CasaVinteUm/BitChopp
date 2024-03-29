@@ -26,6 +26,7 @@ public partial class App : Application
         Configuration = builder.Build();
         ConfigService = new ConfigService(Configuration);
 
+        Console.WriteLine($"LnBitsHost: {ConfigService?.GetLnBitsHost()}");
         Console.WriteLine($"Your API Key: {ConfigService?.GetApiKey()}");
         Console.WriteLine($"Switch ID: {ConfigService?.GetSwitchId()}");
     }
@@ -43,7 +44,7 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel(apiService)
+                DataContext = new MainViewModel(apiService, ConfigService)
             };
         }
 

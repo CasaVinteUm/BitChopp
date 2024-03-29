@@ -1,12 +1,11 @@
+using Avalonia.Controls;
+using Avalonia.Threading;
+using QRCoder;
 using System;
 using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
-using Avalonia.Controls;
-using QRCoder;
-using Avalonia.Threading;
-
 
 namespace BitChopp.Views;
 
@@ -69,7 +68,9 @@ public partial class QRCodeWindow : Window
                 var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
                 // Handle the message
                 WebSocketResult = message;
-                CloseDialog(null, null);
+
+                Close();
+
                 break; // Close after receiving the first message
             }
         }
