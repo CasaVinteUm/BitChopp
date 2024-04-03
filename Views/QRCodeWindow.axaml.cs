@@ -16,6 +16,7 @@ public partial class QRCodeWindow : Window
     private readonly string _deviceId;
     private readonly int _pinId;
     private readonly string _lnUrl;
+    private readonly Uri _wsUrl;
 
     public string? WebSocketResult { get; private set; }
 
@@ -47,6 +48,8 @@ public partial class QRCodeWindow : Window
             Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None);
         }
 
+        _wsUrl = configService.GetWsHost();
+
         Dispatcher.UIThread.InvokeAsync(() => OpenWebSocketAsync());
     }
 
@@ -59,7 +62,7 @@ public partial class QRCodeWindow : Window
     {
         try
         {
-            await _webSocket.ConnectAsync(new Uri($"wss://lnbits.casa21.space/api/v1/ws/{_deviceId}"), CancellationToken.None);
+            await _webSocket.ConnectAsync(_wsUrl, CancellationToken.None);
             StartListening();
         }
         catch (Exception ex)

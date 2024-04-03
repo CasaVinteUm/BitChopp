@@ -25,6 +25,14 @@ public class ConfigService(IConfiguration configuration)
         return new Uri(host);
     }
 
+    public Uri GetWsHost()
+    {
+        var lnbitsHost = this.GetLnBitsHost();
+        var deviceId = this.GetSwitchId();
+        var wsHost = lnbitsHost.ToString().Replace("http", "ws");
+        return new Uri($"{wsHost}api/v1/ws/{deviceId}");
+    }
+
     public bool IsKiosk()
     {
         return _configuration["IsKiosk"] == "1" || _configuration["IsKiosk"]?.ToLowerInvariant() == "true";
