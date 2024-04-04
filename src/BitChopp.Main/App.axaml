@@ -6,5 +6,23 @@
 
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="Window">
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="FontFamily" Value="Calibri"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="WindowStartupLocation" Value="CenterScreen"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Foreground" Value="Gold"/>
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="BorderBrush" Value="Gold"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="Gold"/>
+            <Setter Property="FontSize" Value="30"/>
+        </Style>
     </Application.Styles>
 </Application>
