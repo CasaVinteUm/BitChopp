@@ -1,8 +1,7 @@
 using System;
-
 using Microsoft.Extensions.Configuration;
 
-namespace BitChopp;
+namespace BitChopp.Main.Services;
 
 public class ConfigService(IConfiguration configuration)
 {

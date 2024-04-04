@@ -1,16 +1,17 @@
-using Avalonia.Controls;
-using DynamicData;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Controls;
+using DynamicData;
+using ReactiveUI;
 
-namespace BitChopp.ViewModels;
+namespace BitChopp.Main.ViewModels;
 
 using Models;
+using Services;
 using Views;
 
 public class MainViewModel : ReactiveObject
@@ -47,7 +48,7 @@ public class MainViewModel : ReactiveObject
         await task;
 
         var result = qrWindow.WebSocketResult;
-        
+
         // TODO: Enable GPIO pin to release the beer
     }
 

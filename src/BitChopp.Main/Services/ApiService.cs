@@ -3,9 +3,9 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-using BitChopp.Models;
+namespace BitChopp.Main.Services;
 
-namespace BitChopp;
+using Models;
 
 public class ApiService
 {

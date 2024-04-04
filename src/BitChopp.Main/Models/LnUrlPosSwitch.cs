@@ -1,4 +1,4 @@
-namespace BitChopp.Models;
+namespace BitChopp.Main.Models;
 
 public class LnUrlPosSwitch
 {

@@ -4,8 +4,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Configuration;
 
-namespace BitChopp;
+namespace BitChopp.Main;
 
+using Services;
 using ViewModels;
 using Views;
 
