@@ -70,28 +70,34 @@ public partial class QRCodeWindow : KioskBaseWindow
             var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             if (result.MessageType != WebSocketMessageType.Text)
             {
-                Console.WriteLine("Received non-text WebSocket message.");
-                continue;
+                if (result.MessageType != WebSocketMessageType.Text)
+                {
+                    Console.WriteLine("Received non-text WebSocket message.");
+                    continue;
+                }
+
+                var message = Encoding.UTF8.GetString(buffer, 0, result.Count).Split('-');
+
+                var pin = int.Parse(message[0]);
+                var duration = int.Parse(message[1]);
+
+                // TODO: Check PIN id; message = pinId-duration
+                if (pin != _pinId)
+                {
+                    if (pin != _pinId)
+                    {
+                        Console.Error.WriteLine("Invalid PIN. Someone probably paid old invoice");
+                        return;
+                    }
+
+                    WebSocketResult = "Paid";
+
+                    _ = _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+
+                    Close();
+                    return;
+                }
             }
-
-            var message = Encoding.UTF8.GetString(buffer, 0, result.Count).Split('-');
-
-            var pin = int.Parse(message[0]);
-            var duration = int.Parse(message[1]);
-
-            // TODO: Check PIN id; message = pinId-duration
-            if (pin != _pinId)
-            {
-                Console.Error.WriteLine("Invalid PIN. Someone probably paid old invoice");
-                return;
-            }
-
-            WebSocketResult = "Paid";
-
-            _ = _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
-
-            Close();
-            return;
         }
     }
 }
