@@ -2,30 +2,18 @@
 
 Casa21's BitChopp is a simple GUI that allows us to sell draft beer.
 
-## Running
+## Using Just
 
-To start the project locally, run:
+For a better experience, we recommend using [Just](https://just.systems/) to run the project.
 
-```bash
-dotnet run
-```
+Download and install the latest version of Just from [github](https://github.com/casey/just/releases).
 
-## Building
-
-To build the project to be executed on a RaspiOS, run:
+After installing Just, you can check the available options by typing:
 
 ```bash
-dotnet clean && dotnet publish -c Release -r linux-arm -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
+just
 ```
 
-## Copying to Raspberry Pi
+### Running without Just
 
-To copy the project to a Raspberry Pi, run:
-
-```bash
-# If you're using your default key:
-rsync -avz --progress bin/Release/net8.0/linux-arm/publish/* pi@casa21chopp.local:/home/pi/BitChopp
-
-# If you're using a custom key:
-rsync -avz --progress -e "ssh -i ssh_path/your_key" bin/Release/net8.0/linux-arm/publish/* pi@casa21chopp.local:/home/pi/BitChopp
-```
+If you don't want to use Just, you can check all the available commands in the [justfile](justfile) and run them manually.
