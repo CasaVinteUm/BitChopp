@@ -12,6 +12,8 @@
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="WindowStartupLocation" Value="CenterScreen"/>
+            <Setter Property="Width" Value="600"/>
+            <Setter Property="Height" Value="1024"/>
         </Style>
         <Style Selector="Button">
             <Setter Property="Foreground" Value="Gold"/>

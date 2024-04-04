@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="BitChopp.Main.Views.SuccessWindow"
+        Title="BitChopp - Casa21 - Saúde!">
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+        <TextBlock x:Name="tipTextBlock" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Puxe a alavanca para frente" FontSize="30" Margin="10,0,10,50"/>
+        <ProgressBar x:Name="beerProgressBar" Minimum="0" Maximum="100" Value="0" Height="800" Width="400" Orientation="Vertical" Foreground="#EBBB40"/>
+        <TextBlock HorizontalAlignment="Center" x:Name="timerTextBlock" Text="Tire seu Chopp em até 60 segundos..." FontSize="20" Margin="0,50,0,0"/>
+    </StackPanel>
+</Window>

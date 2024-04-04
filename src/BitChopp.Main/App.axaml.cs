@@ -48,6 +48,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(apiService, ConfigService)
             };
+            // desktop.MainWindow = new SuccessWindow(473, ConfigService);
         }
 
         base.OnFrameworkInitializationCompleted();
