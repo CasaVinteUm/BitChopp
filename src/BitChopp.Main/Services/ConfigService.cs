@@ -1,8 +1,7 @@
 using System;
-
 using Microsoft.Extensions.Configuration;
 
-namespace BitChopp;
+namespace BitChopp.Main.Services;
 
 public class ConfigService(IConfiguration configuration)
 {
@@ -27,10 +26,8 @@ public class ConfigService(IConfiguration configuration)
 
     public Uri GetWsHost()
     {
-        var lnbitsHost = this.GetLnBitsHost();
-        var deviceId = this.GetSwitchId();
-        var wsHost = lnbitsHost.ToString().Replace("http", "ws");
-        return new Uri($"{wsHost}api/v1/ws/{deviceId}");
+        var wsHost = GetLnBitsHost().ToString().Replace("http", "ws");
+        return new Uri($"{wsHost}api/v1/ws/{GetSwitchId()}");
     }
 
     public bool IsKiosk()

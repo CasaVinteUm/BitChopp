@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace BitChopp.Models;
+namespace BitChopp.Main.Models;
 
 public class LnUrlPosDevice
 {

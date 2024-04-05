@@ -1,0 +1,12 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="1024"
+        x:Class="BitChopp.Main.Views.QRCodeWindow"
+        Title="BitChopp - Casa21 - Pay!">
+  <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Image x:Name="QrCodeImage" Width="500" Height="500" Stretch="Uniform"/>
+    <Button Content="Cancelar" HorizontalAlignment="Center" Click="CloseDialog"/>
+  </StackPanel>
+</Window>

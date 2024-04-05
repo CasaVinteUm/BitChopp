@@ -1,15 +1,16 @@
-using Avalonia.Controls;
-using Avalonia.Threading;
-using QRCoder;
 using System;
 using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
+using Avalonia.Threading;
+using QRCoder;
 
-namespace BitChopp.Views;
+namespace BitChopp.Main.Views;
 
-public partial class QRCodeWindow : Window
+using Services;
+
+public partial class QRCodeWindow : KioskBaseWindow
 {
     private readonly ClientWebSocket _webSocket = new();
 
@@ -20,7 +21,7 @@ public partial class QRCodeWindow : Window
 
     public string? WebSocketResult { get; private set; }
 
-    public QRCodeWindow(string deviceId, int pinId, string lnUrl, ConfigService configService)
+    public QRCodeWindow(string deviceId, int pinId, string lnUrl, ConfigService configService) : base(configService)
     {
         InitializeComponent();
 
@@ -37,16 +38,6 @@ public partial class QRCodeWindow : Window
 
         var bitmap = new Avalonia.Media.Imaging.Bitmap(ms);
         QrCodeImage.Source = bitmap;
-
-        var isKiosk = configService.IsKiosk();
-        if (isKiosk) {
-            WindowState = WindowState.FullScreen;
-            ExtendClientAreaToDecorationsHint = true;
-            ExtendClientAreaTitleBarHeightHint = -1d;
-            SystemDecorations = SystemDecorations.None;
-            ShowInTaskbar = false;
-            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None);
-        }
 
         _wsUrl = configService.GetWsHost();
 
@@ -77,7 +68,8 @@ public partial class QRCodeWindow : Window
         while (_webSocket.State == WebSocketState.Open)
         {
             var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            if (result.MessageType != WebSocketMessageType.Text) {
+            if (result.MessageType != WebSocketMessageType.Text)
+            {
                 Console.WriteLine("Received non-text WebSocket message.");
                 continue;
             }
@@ -88,7 +80,8 @@ public partial class QRCodeWindow : Window
             var duration = int.Parse(message[1]);
 
             // TODO: Check PIN id; message = pinId-duration
-            if(pin != _pinId) {
+            if (pin != _pinId)
+            {
                 Console.Error.WriteLine("Invalid PIN. Someone probably paid old invoice");
                 return;
             }
