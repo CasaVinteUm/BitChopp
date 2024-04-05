@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Controls;
 using DynamicData;
@@ -18,6 +14,7 @@ using Views;
 public partial class MainViewModel : ReactiveObject
 {
     private readonly ConfigService _configService;
+    // private readonly Image _loadingImage;
 
     [GeneratedRegex(@"(\d+)(ml|L)")]
     private static partial Regex VolumeRegex();
@@ -29,6 +26,8 @@ public partial class MainViewModel : ReactiveObject
 
     public MainViewModel(ApiService apiService, ConfigService configService)
     {
+        // _loadingImage = 
+
         SwitchCommand = ReactiveCommand.Create<SwitchCommandObject>(OnSwitchSelected);
 
         DeviceId = configService.GetSwitchId();

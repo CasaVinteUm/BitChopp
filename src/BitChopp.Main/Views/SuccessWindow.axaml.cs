@@ -1,7 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using System;
-using System.Threading;
 using Avalonia.Threading;
 
 namespace BitChopp.Main.Views;

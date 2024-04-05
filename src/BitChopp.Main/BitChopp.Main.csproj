@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
@@ -11,6 +12,8 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.10" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Labs.Controls" Version="11.0.10.1" />
+    <PackageReference Include="Avalonia.Labs.Lottie" Version="11.0.10.1" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.10" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
@@ -30,5 +33,10 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\logo.png" />
+    <AvaloniaResource Include="Assets\loader.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BitChopp.Common\BitChopp.Common.csproj" />
   </ItemGroup>
 </Project>
