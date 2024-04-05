@@ -9,6 +9,7 @@ public class PouringTipsService(int maxVolume)
     private const string TipHangTight = "Calma, você já vai tomar seu chopp...";
     private const string TipKeepTilted = "Continue inclinando o copo para evitar espuma.";
     private const string TipFinishPour = "Agora deixe o copo nivelado e empurre a alavanca para finalizar o chopp com um belo colarinho.";
+    private const string TipCheers = "Saúde!";
     private const int VolumeForTilt = 10; // volume in ml when we tell the user to tilt the glass
     private const int PercentageForFinish = 90;
 
@@ -22,8 +23,12 @@ public class PouringTipsService(int maxVolume)
     {
         var lastTip = _currentTip;
 
+        if (volume == -1)
+        {
+            _currentTip = TipCheers;
+        }
         // Tilt glass tip should be shown once when the pouring starts
-        if (volume >= VolumeForTilt && volume < _volumeForTipChange)
+        else if (volume >= VolumeForTilt && volume < _volumeForTipChange)
         {
             _currentTip = TipTiltGlass;
         }
@@ -54,10 +59,21 @@ public class PouringTipsService(int maxVolume)
     {
         var size = textBlock.Text!.Length * textBlock.FontSize;
 
-        while (size > 1200 && textBlock.FontSize > 25)
+        if (size < 1200)
         {
-            textBlock.FontSize -= 1;
-            size = textBlock.Text!.Length * textBlock.FontSize;
+            while (size < 1200 && textBlock.FontSize < 75)
+            {
+                textBlock.FontSize += 1;
+                size = textBlock.Text!.Length * textBlock.FontSize;
+            }
+        }
+        else
+        {
+            while (size > 1200 && textBlock.FontSize > 25)
+            {
+                textBlock.FontSize -= 1;
+                size = textBlock.Text!.Length * textBlock.FontSize;
+            }
         }
     }
 }

@@ -13,21 +13,25 @@ using Views;
 
 public partial class MainViewModel : ReactiveObject
 {
-    private readonly ConfigService _configService;
-    // private readonly Image _loadingImage;
-
     [GeneratedRegex(@"(\d+)(ml|L)")]
     private static partial Regex VolumeRegex();
+
+    private readonly ConfigService _configService;
+
+    private bool _isLoading;
 
     public readonly string DeviceId;
 
     public ObservableCollection<LnUrlPosSwitch> Switches { get; } = [];
     public ICommand SwitchCommand { get; }
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set => this.RaiseAndSetIfChanged(ref _isLoading, value);
+    }
 
     public MainViewModel(ApiService apiService, ConfigService configService)
     {
-        // _loadingImage = 
-
         SwitchCommand = ReactiveCommand.Create<SwitchCommandObject>(OnSwitchSelected);
 
         DeviceId = configService.GetSwitchId();
@@ -70,6 +74,8 @@ public partial class MainViewModel : ReactiveObject
 
     private async Task LoadSwitchesAsync(ApiService apiService)
     {
+        IsLoading = true;
+
         var lnUrlPosDevices = (await apiService.FetchLnurlPos()) ?? throw new Exception("Failed to fetch data");
 
         if (lnUrlPosDevices.Count == 0)
@@ -81,6 +87,8 @@ public partial class MainViewModel : ReactiveObject
         var lnUrlDevice = lnUrlPosDevices.FirstOrDefault(r => r.Id?.ToString() == DeviceId) ?? throw new Exception("Could not find the device with the specified ID");
 
         UpdateUI(lnUrlDevice.Switches);
+
+        IsLoading = false;
     }
 
     private static int ExtractVolume(string text)

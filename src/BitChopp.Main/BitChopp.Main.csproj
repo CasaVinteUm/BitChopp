@@ -32,11 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Assets\logo.png" />
+    <AvaloniaResource Include="Assets\cheers.json" />
     <AvaloniaResource Include="Assets\loader.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\BitChopp.Common\BitChopp.Common.csproj" />
+    <AvaloniaResource Include="Assets\logo.png" />
   </ItemGroup>
 </Project>
