@@ -34,4 +34,14 @@ public class ConfigService(IConfiguration configuration)
     {
         return _configuration["IsKiosk"] == "1" || _configuration["IsKiosk"]?.ToLowerInvariant() == "true";
     }
+
+    public int ValvePin()
+    {
+        return int.Parse(_configuration["ValvePin"] ?? "40");
+    }
+
+    public int FlowSensorPin()
+    {
+        return int.Parse(_configuration["FlowSensorPin"] ?? "11");
+    }
 }

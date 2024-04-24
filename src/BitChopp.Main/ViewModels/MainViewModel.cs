@@ -20,6 +20,7 @@ public class MainViewModel : ReactiveObject
 
     public readonly string DeviceId;
     private readonly ConfigService _configService;
+    private readonly PourService _pourService;
 
     public ICommand SwitchCommand { get; }
 
@@ -29,7 +30,9 @@ public class MainViewModel : ReactiveObject
 
         DeviceId = configService.GetSwitchId();
         _ = LoadSwitchesAsync(apiService);
+
         _configService = configService;
+        _pourService = new PourService(configService);
     }
 
     private async void OnSwitchSelected(SwitchCommandObject swObj)
@@ -49,7 +52,7 @@ public class MainViewModel : ReactiveObject
 
         var result = qrWindow.WebSocketResult;
 
-        // TODO: Enable GPIO pin to release the beer
+        _pourService.PourExactly(100);
     }
 
     private async Task LoadSwitchesAsync(ApiService apiService)
