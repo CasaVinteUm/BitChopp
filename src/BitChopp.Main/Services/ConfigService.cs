@@ -33,4 +33,9 @@ public class ConfigService(IConfiguration configuration)
     {
         return _configuration["IsKiosk"] == "1" || _configuration["IsKiosk"]?.ToLowerInvariant() == "true";
     }
+
+    public bool IsDebug()
+    {
+        return _configuration["IsDebug"] == "1" || _configuration["IsDebug"]?.ToLowerInvariant() == "true";
+    }
 }

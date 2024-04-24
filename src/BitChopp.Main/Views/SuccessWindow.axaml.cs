@@ -31,6 +31,12 @@ public partial class SuccessWindow : KioskBaseWindow
 
         beerProgressBar.Maximum = volume;
         _fakeBeerFlowTimer = new Timer(UpdateBeerProgressBar, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100)); // Tick every second
+
+        Closing += (sender, e) =>
+        {
+            _countDownTimer.Dispose();
+            _fakeBeerFlowTimer.Dispose();
+        };
     }
 
     private void UpdateCountdown(object? state)
@@ -40,12 +46,20 @@ public partial class SuccessWindow : KioskBaseWindow
         // Update UI on the UI thread
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            timerTextBlock.Text = string.Format(_timerMessage, _timeLeft);
-
-            if (_timeLeft <= 0)
+            try
             {
-                _countDownTimer.Dispose();
-                Close();
+                timerTextBlock.Text = string.Format(_timerMessage, _timeLeft);
+
+                if (_timeLeft <= 0)
+                {
+                    _countDownTimer.Dispose();
+                    _fakeBeerFlowTimer.Dispose();
+                    Close();
+                }
+            }
+            catch
+            {
+                // Ignore
             }
         });
     }
@@ -56,14 +70,21 @@ public partial class SuccessWindow : KioskBaseWindow
         // Update UI on the UI thread
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            beerProgressBar.Value += 1;
-
-            _pouringTipsService.UpdateTipByVolume(tipTextBlock, (int)beerProgressBar.Value);
-
-            if (beerProgressBar.Value >= beerProgressBar.Maximum)
+            try
             {
-                _fakeBeerFlowTimer.Dispose();
-                ShowCheers();
+                beerProgressBar.Value += 50;
+
+                _pouringTipsService.UpdateTipByVolume(tipTextBlock, (int)beerProgressBar.Value);
+
+                if (beerProgressBar.Value >= beerProgressBar.Maximum)
+                {
+                    _fakeBeerFlowTimer.Dispose();
+                    ShowCheers();
+                }
+            }
+            catch
+            {
+                // Ignore
             }
         });
     }
@@ -79,10 +100,17 @@ public partial class SuccessWindow : KioskBaseWindow
 
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _pouringTipsService.UpdateTipByVolume(tipTextBlock, -1);
+            try
+            {
+                _pouringTipsService.UpdateTipByVolume(tipTextBlock, -1);
 
-            beerProgressBar.IsVisible = false;
-            cheersAnimation.IsVisible = true;
+                beerProgressBar.IsVisible = false;
+                cheersAnimation.IsVisible = true;
+            }
+            catch
+            {
+                // Ignore
+            }
         });
     }
 }

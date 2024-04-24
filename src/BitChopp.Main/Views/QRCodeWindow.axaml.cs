@@ -86,7 +86,7 @@ public partial class QRCodeWindow : KioskBaseWindow
                 var message = Encoding.UTF8.GetString(buffer, 0, result.Count).Split('-');
 
                 var pin = int.Parse(message[0]);
-                var duration = int.Parse(message[1]);
+                // var duration = int.Parse(message[1]);
 
                 // TODO: Check PIN id; message = pinId-duration
                 if (pin != _pinId)

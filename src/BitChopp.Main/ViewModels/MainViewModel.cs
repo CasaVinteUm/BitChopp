@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Avalonia.Controls;
 using DynamicData;
@@ -6,7 +7,6 @@ using ReactiveUI;
 
 namespace BitChopp.Main.ViewModels;
 
-using System.Text.RegularExpressions;
 using Models;
 using Services;
 using Views;
@@ -55,10 +55,10 @@ public partial class MainViewModel : ReactiveObject
         };
         await qrWindow.ShowDialog(swObj.Window);
 
-        // if (qrWindow.WebSocketResult == "Paid")
-        // {
-        await ShowSuccessWindow(swObj); // replace with actual value
-        // }
+        if (qrWindow.WebSocketResult == "Paid" || _configService.IsDebug())
+        {
+            await ShowSuccessWindow(swObj);
+        }
     }
 
     private async Task ShowSuccessWindow(SwitchCommandObject swObj)
