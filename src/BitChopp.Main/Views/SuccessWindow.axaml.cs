@@ -2,13 +2,15 @@ using Avalonia.Threading;
 
 namespace BitChopp.Main.Views;
 
+using ViewModels;
 using Services;
+using ReactiveUI;
 
 public partial class SuccessWindow : KioskBaseWindow
 {
     private readonly PouringTipsService _pouringTipsService;
-    private readonly Timer _fakeBeerFlowTimer;
     private readonly Timer _countDownTimer;
+    private readonly SuccessViewModel _viewModel;
 
     private int _timeLeft = 60; // Seconds
     private string _timerMessage = "Tire seu Chopp em até {0} segundos...";
@@ -19,24 +21,40 @@ public partial class SuccessWindow : KioskBaseWindow
     {
         _pouringTipsService = new PouringTipsService(0);
         _countDownTimer = new Timer(null, null, Timeout.Infinite, Timeout.Infinite);
-        _fakeBeerFlowTimer = new Timer(null, null, Timeout.Infinite, Timeout.Infinite);
+        _viewModel = new SuccessViewModel(0, null);
     }
 #pragma warning restore CS8625
-    public SuccessWindow(int volume, ConfigService configService) : base(configService)
+    public SuccessWindow(SuccessViewModel viewModel) : base(viewModel.ConfigService)
     {
         InitializeComponent();
+        DataContext = viewModel;
+        _viewModel = viewModel;
 
-        _pouringTipsService = new PouringTipsService(volume);
+        _pouringTipsService = new PouringTipsService(viewModel.Volume);
         _countDownTimer = new Timer(UpdateCountdown, null, TimeSpan.Zero, TimeSpan.FromSeconds(1)); // Tick every second
 
-        beerProgressBar.Maximum = volume;
-        _fakeBeerFlowTimer = new Timer(UpdateBeerProgressBar, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100)); // Tick every second
+        Activated += (sender, e) =>
+        {
+            this.WhenAnyValue(x => x._viewModel.PourEnded, x => x._viewModel.FlowCounter)
+                .Subscribe(_ => HandleViewModelUpdates());
+        };
 
         Closing += (sender, e) =>
         {
             _countDownTimer.Dispose();
-            _fakeBeerFlowTimer.Dispose();
         };
+    }
+
+    private void HandleViewModelUpdates()
+    {
+        if (_viewModel.PourEnded)
+        {
+            ShowCheers();
+        }
+        else if (_viewModel.FlowCounter > 0)
+        {
+            _pouringTipsService.UpdateTipByVolume(tipTextBlock, _viewModel.FlowCounter);
+        }
     }
 
     private void UpdateCountdown(object? state)
@@ -53,33 +71,7 @@ public partial class SuccessWindow : KioskBaseWindow
                 if (_timeLeft <= 0)
                 {
                     _countDownTimer.Dispose();
-                    _fakeBeerFlowTimer.Dispose();
                     Close();
-                }
-            }
-            catch
-            {
-                // Ignore
-            }
-        });
-    }
-
-    // Placeholder for actual beer flow sensor handling
-    private void UpdateBeerProgressBar(object? state)
-    {
-        // Update UI on the UI thread
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            try
-            {
-                beerProgressBar.Value += 50;
-
-                _pouringTipsService.UpdateTipByVolume(tipTextBlock, (int)beerProgressBar.Value);
-
-                if (beerProgressBar.Value >= beerProgressBar.Maximum)
-                {
-                    _fakeBeerFlowTimer.Dispose();
-                    ShowCheers();
                 }
             }
             catch

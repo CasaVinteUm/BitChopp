@@ -7,6 +7,7 @@ using ReactiveUI;
 
 namespace BitChopp.Main.ViewModels;
 
+using Interfaces;
 using Models;
 using Services;
 using Views;
@@ -17,9 +18,10 @@ public partial class MainViewModel : ReactiveObject
     private static partial Regex VolumeRegex();
 
     private readonly ConfigService _configService;
-    private readonly PourService _pourService;
+    private readonly IPourService _pourService;
 
     private bool _isLoading;
+    private SuccessViewModel? _successViewModel;
 
     public readonly string DeviceId;
 
@@ -39,7 +41,15 @@ public partial class MainViewModel : ReactiveObject
         _ = LoadSwitchesAsync(apiService);
 
         _configService = configService;
-        _pourService = new PourService(configService);
+
+        if (!_configService.IsDebug())
+        {
+            _pourService = new PourService(configService);
+        }
+        else
+        {
+            _pourService = new MockPourService();
+        }
     }
 
     private async void OnSwitchSelected(SwitchCommandObject swObj)
@@ -67,8 +77,13 @@ public partial class MainViewModel : ReactiveObject
     private async Task ShowSuccessWindow(SwitchCommandObject swObj)
     {
         var volume = ExtractVolume(swObj.Switch.Description);
+        _successViewModel = new SuccessViewModel(volume, _configService);
 
-        var successWindow = new SuccessWindow(volume, _configService)
+        _pourService.PourExactly(volume);
+        _pourService.FlowCounterUpdated += (s, e) => _successViewModel.FlowCounter = e;
+        _pourService.PourEnded += (s, e) => _successViewModel.PourEnded = e;
+
+        var successWindow = new SuccessWindow(_successViewModel)
         {
             Topmost = true
         };
