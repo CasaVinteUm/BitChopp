@@ -17,6 +17,7 @@ public partial class MainViewModel : ReactiveObject
     private static partial Regex VolumeRegex();
 
     private readonly ConfigService _configService;
+    private readonly PourService _pourService;
 
     private bool _isLoading;
 
@@ -36,7 +37,9 @@ public partial class MainViewModel : ReactiveObject
 
         DeviceId = configService.GetSwitchId();
         _ = LoadSwitchesAsync(apiService);
+
         _configService = configService;
+        _pourService = new PourService(configService);
     }
 
     private async void OnSwitchSelected(SwitchCommandObject swObj)
