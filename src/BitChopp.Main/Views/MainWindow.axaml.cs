@@ -10,7 +10,6 @@ using ViewModels;
 public partial class MainWindow : KioskBaseWindow
 {
     // This constructor is used by Avalonia
-
 #pragma warning disable CS8625
     public MainWindow() : base(null)
     {

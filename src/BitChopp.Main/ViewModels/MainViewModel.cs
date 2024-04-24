@@ -81,7 +81,7 @@ public partial class MainViewModel : ReactiveObject
 
         var lnUrlPosDevices = (await apiService.FetchLnurlPos()) ?? throw new Exception("Failed to fetch data");
 
-        if (lnUrlPosDevices.Count == 0)
+        if (lnUrlPosDevices.Count() == 0)
         {
             Console.Error.WriteLine("Failed to fetch a valid list of lnurl devices");
             return;
