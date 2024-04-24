@@ -21,6 +21,16 @@ public partial class QRCodeWindow : KioskBaseWindow
 
     public string? WebSocketResult { get; private set; }
 
+    // This constructor is used by Avalonia
+#pragma warning disable CS8625
+    public QRCodeWindow() : base(null)
+    {
+        InitializeComponent();
+        _deviceId = string.Empty;
+        _lnUrl = string.Empty;
+        _wsUrl = new Uri(string.Empty);
+    }
+#pragma warning restore CS8625
     public QRCodeWindow(string deviceId, int pinId, string lnUrl, ConfigService configService) : base(configService)
     {
         InitializeComponent();
@@ -77,7 +87,7 @@ public partial class QRCodeWindow : KioskBaseWindow
             var message = Encoding.UTF8.GetString(buffer, 0, result.Count).Split('-');
 
             var pin = int.Parse(message[0]);
-            var duration = int.Parse(message[1]);
+            // var duration = int.Parse(message[1]);
 
             // TODO: Check PIN id; message = pinId-duration
             if (pin != _pinId)

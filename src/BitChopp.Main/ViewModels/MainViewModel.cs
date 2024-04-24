@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -14,15 +15,25 @@ using Models;
 using Services;
 using Views;
 
-public class MainViewModel : ReactiveObject
+public partial class MainViewModel : ReactiveObject
 {
-    public ObservableCollection<LnUrlPosSwitch> Switches { get; } = [];
+    [GeneratedRegex(@"(\d+)(ml|L)")]
+    private static partial Regex VolumeRegex();
 
-    public readonly string DeviceId;
     private readonly ConfigService _configService;
     private readonly PourService _pourService;
 
+    private bool _isLoading;
+
+    public readonly string DeviceId;
+
+    public ObservableCollection<LnUrlPosSwitch> Switches { get; } = [];
     public ICommand SwitchCommand { get; }
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set => this.RaiseAndSetIfChanged(ref _isLoading, value);
+    }
 
     public MainViewModel(ApiService apiService, ConfigService configService)
     {
@@ -45,21 +56,39 @@ public class MainViewModel : ReactiveObject
         // Logic to handle switch selection, such as navigating to a new screen and displaying the QR code
         Console.WriteLine($"Selected Switch's Lnurl: {swObj.Switch.Lnurl}");
 
-        var qrWindow = new QRCodeWindow(DeviceId, swObj.Switch.Pin, swObj.Switch.Lnurl, _configService);
-        var task = qrWindow.ShowDialog(swObj.Window);
-        qrWindow.Topmost = true; // Make the window always on top
-        await task;
+        var qrWindow = new QRCodeWindow(DeviceId, swObj.Switch.Pin, swObj.Switch.Lnurl, _configService)
+        {
+            Topmost = true // Make the window always on top
+        };
+        await qrWindow.ShowDialog(swObj.Window);
 
-        var result = qrWindow.WebSocketResult;
+        if (qrWindow.WebSocketResult == "Paid" || _configService.IsDebug())
+        {
+            await ShowSuccessWindow(swObj);
+        }
+    }
 
-        _pourService.PourExactly(100);
+    private async Task ShowSuccessWindow(SwitchCommandObject swObj)
+    {
+        var volume = ExtractVolume(swObj.Switch.Description);
+
+        _pourService.PourExactly(volume);
+
+        var successWindow = new SuccessWindow(volume, _configService)
+        {
+            Topmost = true
+        };
+        await successWindow.ShowDialog(swObj.Window);
+
     }
 
     private async Task LoadSwitchesAsync(ApiService apiService)
     {
+        IsLoading = true;
+
         var lnUrlPosDevices = (await apiService.FetchLnurlPos()) ?? throw new Exception("Failed to fetch data");
 
-        if (lnUrlPosDevices.Count == 0)
+        if (lnUrlPosDevices.Count() == 0)
         {
             Console.Error.WriteLine("Failed to fetch a valid list of lnurl devices");
             return;
@@ -68,6 +97,34 @@ public class MainViewModel : ReactiveObject
         var lnUrlDevice = lnUrlPosDevices.FirstOrDefault(r => r.Id?.ToString() == DeviceId) ?? throw new Exception("Could not find the device with the specified ID");
 
         UpdateUI(lnUrlDevice.Switches);
+
+        IsLoading = false;
+    }
+
+    private static int ExtractVolume(string text)
+    {
+        // This regex pattern looks for numbers followed directly by either 'ml' or 'L'
+        var match = VolumeRegex().Match(text);
+
+        if (match.Success)
+        {
+            // Extract the numeric part of the match
+            var number = int.Parse(match.Groups[1].Value);
+
+            // Check if the unit is 'L' and convert to milliliters if necessary
+            if (match.Groups[2].Value == "L")
+            {
+                return number * 1000;
+            }
+            else // It's already in 'ml', so return as is
+            {
+                return number;
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException("No volume information found in the string.");
+        }
     }
 
     private void UpdateUI(List<LnUrlPosSwitch> switches)
