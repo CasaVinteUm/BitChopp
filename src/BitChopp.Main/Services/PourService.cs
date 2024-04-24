@@ -2,7 +2,9 @@ using System.Device.Gpio;
 
 namespace BitChopp.Main.Services;
 
-public class PourService
+using Interfaces;
+
+public class PourService : IPourService
 {
     private readonly GpioController _gpioController;
     private readonly int _valvePin = 40;
@@ -11,6 +13,8 @@ public class PourService
     private bool _isValveOpen = false;
 
     public int FlowCounter { get; private set; }
+    public event EventHandler<int>? FlowCounterUpdated;
+    public event EventHandler<bool>? PourEnded;
 
     public PourService(ConfigService configService)
     {
@@ -26,7 +30,7 @@ public class PourService
         _gpioController.RegisterCallbackForPinValueChangedEvent(_flowSensorPin, PinEventTypes.Rising | PinEventTypes.Falling, HandleFlow);
     }
 
-    public void PourExactly(int milliliters)
+    public async void PourExactly(int milliliters)
     {
         FlowCounter = 0;
 
@@ -34,11 +38,12 @@ public class PourService
 
         while (FlowCounter < milliliters)
         {
-            // Wait for the flow sensor to count the desired amount of milliliters
-            // Maybe raise an event?
+            await Task.Yield();
         }
 
         CloseValve();
+
+        PourEnded?.Invoke(this, true);
     }
 
     public void OpenValve()
@@ -71,6 +76,7 @@ public class PourService
         if (pinValueChangedEventArgs.PinNumber == _flowSensorPin)
         {
             FlowCounter++;
+            FlowCounterUpdated?.Invoke(this, FlowCounter);
         }
     }
 }

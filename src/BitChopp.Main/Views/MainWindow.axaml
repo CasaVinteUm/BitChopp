@@ -5,7 +5,6 @@
         xmlns:vm="clr-namespace:BitChopp.Main.ViewModels;assembly=BitChopp.Main"
         xmlns:lottie="using:Avalonia.Labs.Lottie"
         x:DataType="vm:MainViewModel"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="1024"
         x:Class="BitChopp.Main.Views.MainWindow"
         Title="BitChopp - Casa21">
     <Grid>
