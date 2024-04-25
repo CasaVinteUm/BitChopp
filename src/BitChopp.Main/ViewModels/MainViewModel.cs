@@ -89,7 +89,6 @@ public partial class MainViewModel : ReactiveObject
             Topmost = true
         };
         await successWindow.ShowDialog(swObj.Window);
-
     }
 
     private async Task LoadSwitchesAsync(ApiService apiService)
