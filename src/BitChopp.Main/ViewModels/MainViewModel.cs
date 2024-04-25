@@ -7,6 +7,7 @@ using ReactiveUI;
 
 namespace BitChopp.Main.ViewModels;
 
+using Avalonia.Threading;
 using Interfaces;
 using Models;
 using Services;
@@ -138,7 +139,7 @@ public partial class MainViewModel : ReactiveObject
     private void UpdateUI(List<LnUrlPosSwitch> switches)
     {
         // Ensure UI updates happen on the UI thread
-        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+        Dispatcher.UIThread.InvokeAsync(() =>
         {
             Switches.Clear();
             Switches.AddRange([.. switches.OrderBy(x => x.Amount)]);

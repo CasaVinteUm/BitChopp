@@ -2,9 +2,9 @@ using Avalonia.Threading;
 
 namespace BitChopp.Main.Views;
 
-using ViewModels;
-using Services;
 using ReactiveUI;
+using Services;
+using ViewModels;
 
 public partial class SuccessWindow : KioskBaseWindow
 {

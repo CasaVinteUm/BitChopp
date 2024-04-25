@@ -27,7 +27,7 @@ public class PourService : IPourService
         _gpioController.Write(_valvePin, PinValue.Low);
 
         _gpioController.OpenPin(_flowSensorPin, PinMode.Input);
-        _gpioController.RegisterCallbackForPinValueChangedEvent(_flowSensorPin, PinEventTypes.Rising | PinEventTypes.Falling, HandleFlow);
+        _gpioController.RegisterCallbackForPinValueChangedEvent(_flowSensorPin, PinEventTypes.Falling | PinEventTypes.Rising, HandleFlow);
     }
 
     public async void PourExactly(int milliliters)
@@ -73,10 +73,10 @@ public class PourService : IPourService
 
     private void HandleFlow(object sender, PinValueChangedEventArgs pinValueChangedEventArgs)
     {
-        if (pinValueChangedEventArgs.PinNumber == _flowSensorPin)
+        if (pinValueChangedEventArgs.PinNumber == 17)
         {
             FlowCounter++;
-            FlowCounterUpdated?.Invoke(this, FlowCounter);
+            Task.Run(() => { FlowCounterUpdated?.Invoke(this, FlowCounter); });
         }
     }
 }

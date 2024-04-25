@@ -7,8 +7,12 @@ using Services;
 
 public partial class KioskBaseWindow : Window
 {
+    protected ConfigService ConfigService { get; }
+
     public KioskBaseWindow(ConfigService configService)
     {
+        ConfigService = configService;
+
         if (configService.IsKiosk())
         {
             WindowState = WindowState.FullScreen;
@@ -16,7 +20,7 @@ public partial class KioskBaseWindow : Window
             ExtendClientAreaTitleBarHeightHint = -1d;
             SystemDecorations = SystemDecorations.None;
             ShowInTaskbar = false;
-            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None);
+            Cursor = new Cursor(StandardCursorType.None);
         }
     }
 
