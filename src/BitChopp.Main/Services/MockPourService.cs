@@ -1,13 +1,24 @@
 namespace BitChopp.Main.Services;
 
+using System.Timers;
 using Interfaces;
 
 public class MockPourService : IPourService
 {
+    private readonly Timer _flowTimer;
+
+    private bool _isValveOpen;
+
     public int FlowCounter { get; private set; }
 
     public event EventHandler<int>? FlowCounterUpdated;
     public event EventHandler<bool>? PourEnded;
+
+    public MockPourService()
+    {
+        _flowTimer = new Timer(TimeSpan.FromMilliseconds(100)); // Set the interval to 50 milliseconds
+        _flowTimer.Elapsed += OnFlowTimerElapsed;
+    }
 
     public async void PourExactly(int milliliters)
     {
@@ -34,11 +45,24 @@ public class MockPourService : IPourService
 
     public void CloseValve()
     {
+        _flowTimer.Stop();
+        _isValveOpen = false;
         Console.WriteLine("Mock: Valve closed.");
     }
 
     public void OpenValve()
     {
+        _flowTimer.Start();
+        _isValveOpen = true;
         Console.WriteLine("Mock: Valve opened.");
+    }
+
+    private void OnFlowTimerElapsed(object? sender, ElapsedEventArgs e)
+    {
+        if (_isValveOpen)
+        {
+            FlowCounter++;
+            FlowCounterUpdated?.Invoke(this, FlowCounter);
+        }
     }
 }

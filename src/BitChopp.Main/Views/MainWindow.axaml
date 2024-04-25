@@ -14,7 +14,7 @@
         </Grid.RowDefinitions>
 
         <!-- Logo -->
-        <Image Grid.Row="0" Source="avares://BitChopp.Main/Assets/logo.png" Width="200" Height="200" Margin="0,100,0,0"/>
+        <Image x:Name="Logo" Grid.Row="0" Source="avares://BitChopp.Main/Assets/logo.png" Width="200" Height="200" Margin="0,100,0,0"/>
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
             <!-- Glass Size Buttons -->
