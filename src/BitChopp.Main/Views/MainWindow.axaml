@@ -2,25 +2,37 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:BitChopp.Main.ViewModels;assembly=BitChopp.Main"
+        xmlns:vm="using:BitChopp.Main.ViewModels"
+        xmlns:lottie="using:Avalonia.Labs.Lottie"
         x:DataType="vm:MainViewModel"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="1024"
         x:Class="BitChopp.Main.Views.MainWindow"
         Title="BitChopp - Casa21">
-  <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-    <!-- Logo -->
-    <Image Source="avares://BitChopp.Main/Assets/logo.png" Width="200" Height="200"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Row for the logo -->
+            <RowDefinition Height="*"/>     <!-- Row for the rest of the content -->
+        </Grid.RowDefinitions>
 
-    <!-- Glass Size Buttons -->
-    <ItemsControl ItemsSource="{Binding Switches}">
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <Button Content="{Binding Description}"
-                        HorizontalAlignment="Center"
-                        Click="OnSwitchButtonClick"/>
-                <!-- Customize the button content and bindings as needed -->
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
-  </StackPanel>
+        <!-- Logo -->
+        <Image Grid.Row="0" Source="avares://BitChopp.Main/Assets/logo.png" Width="200" Height="200" Margin="0,100,0,0"/>
+
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <!-- Glass Size Buttons -->
+            <ItemsControl ItemsSource="{Binding Switches}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding Description}"
+                                HorizontalAlignment="Center"
+                                Click="OnSwitchButtonClick"/>
+                        <!-- Customize the button content and bindings as needed -->
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <lottie:Lottie  Path="avares://BitChopp.Main/Assets/loader.json"
+                            Width="200" Height="200" Margin="0,100,0,0"
+                            HorizontalAlignment="Center"
+                            IsVisible="{Binding IsLoading}"/>
+        </StackPanel>
+  </Grid>
 </Window>

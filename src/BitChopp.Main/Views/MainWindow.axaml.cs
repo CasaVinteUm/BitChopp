@@ -9,6 +9,14 @@ using ViewModels;
 
 public partial class MainWindow : KioskBaseWindow
 {
+    // This constructor is used by Avalonia
+
+#pragma warning disable CS8625
+    public MainWindow() : base(null)
+    {
+        InitializeComponent();
+    }
+#pragma warning restore CS8625
     public MainWindow(ConfigService configService) : base(configService)
     {
         InitializeComponent();
