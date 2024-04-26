@@ -9,15 +9,18 @@ public class PourService : IPourService
     private readonly GpioController _gpioController;
     private readonly int _valvePin = 40;
     private readonly int _flowSensorPin = 11;
+    private readonly ConfigService _configService;
 
     private bool _isValveOpen = false;
 
-    public int FlowCounter { get; private set; }
-    public event EventHandler<int>? FlowCounterUpdated;
+    public double FlowCounter { get; private set; }
+    public event EventHandler<double>? FlowCounterUpdated;
     public event EventHandler<bool>? PourEnded;
 
     public PourService(ConfigService configService)
     {
+        Console.WriteLine("PourService constructor");
+        _configService = configService;
         _gpioController = new GpioController(PinNumberingScheme.Board);
 
         _valvePin = configService.ValvePin();
@@ -32,6 +35,7 @@ public class PourService : IPourService
 
     public async void PourExactly(int milliliters)
     {
+        Console.WriteLine("PourExactly {0} ml", milliliters);
         FlowCounter = 0;
 
         OpenValve();
@@ -40,6 +44,8 @@ public class PourService : IPourService
         {
             await Task.Yield();
         }
+
+        Console.WriteLine("PourEnded");
 
         CloseValve();
 
@@ -50,6 +56,7 @@ public class PourService : IPourService
     {
         if (!_isValveOpen)
         {
+            Console.WriteLine("OpenValve");
             _gpioController.Write(_valvePin, PinValue.High);
             _isValveOpen = true;
         }
@@ -59,6 +66,7 @@ public class PourService : IPourService
     {
         if (_isValveOpen)
         {
+            Console.WriteLine("CloseValve");
             _gpioController.Write(_valvePin, PinValue.Low);
             _isValveOpen = false;
         }
@@ -75,8 +83,14 @@ public class PourService : IPourService
     {
         if (pinValueChangedEventArgs.PinNumber == 17)
         {
-            FlowCounter++;
+            FlowCounter += 1D / _configService.PulsesPerMl();
+            Console.WriteLine("HandleFlow:FlowCounter: {0}", FlowCounter);
             Task.Run(() => { FlowCounterUpdated?.Invoke(this, FlowCounter); });
         }
+    }
+
+    ~PourService()
+    {
+        CleanIO();
     }
 }

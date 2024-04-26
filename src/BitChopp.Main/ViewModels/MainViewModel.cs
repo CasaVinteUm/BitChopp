@@ -2,12 +2,12 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
 
 namespace BitChopp.Main.ViewModels;
 
-using Avalonia.Threading;
 using Interfaces;
 using Models;
 using Services;
@@ -73,6 +73,9 @@ public partial class MainViewModel : ReactiveObject
         {
             await ShowSuccessWindow(swObj);
         }
+
+        qrWindow.Close();
+        qrWindow = null;
     }
 
     private async Task ShowSuccessWindow(SwitchCommandObject swObj)
@@ -80,15 +83,23 @@ public partial class MainViewModel : ReactiveObject
         var volume = ExtractVolume(swObj.Switch.Description);
         _successViewModel = new SuccessViewModel(volume, _configService);
 
-        _pourService.PourExactly(volume);
-        _pourService.FlowCounterUpdated += (s, e) => _successViewModel.FlowCounter = e;
-        _pourService.PourEnded += (s, e) => _successViewModel.PourEnded = e;
+        Console.WriteLine($"Pouring {volume} ml");
+        _ = Task.Run(() =>
+        {
+            _pourService.PourExactly(volume);
+            _pourService.FlowCounterUpdated += (s, e) => _successViewModel.FlowCounter = e;
+            _pourService.PourEnded += (s, e) => _successViewModel.PourEnded = e;
+        });
 
+        Console.WriteLine("Showing success window");
         var successWindow = new SuccessWindow(_successViewModel)
         {
             Topmost = true
         };
         await successWindow.ShowDialog(swObj.Window);
+        Console.WriteLine("Success window closed");
+        successWindow.Close();
+        successWindow = null;
     }
 
     private async Task LoadSwitchesAsync(ApiService apiService)
@@ -97,7 +108,7 @@ public partial class MainViewModel : ReactiveObject
 
         var lnUrlPosDevices = (await apiService.FetchLnurlPos()) ?? throw new Exception("Failed to fetch data");
 
-        if (lnUrlPosDevices.Count() == 0)
+        if (lnUrlPosDevices.Count == 0)
         {
             Console.Error.WriteLine("Failed to fetch a valid list of lnurl devices");
             return;

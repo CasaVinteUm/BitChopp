@@ -6,12 +6,12 @@ using Services;
 
 public class SuccessViewModel : ReactiveObject
 {
-    private int _flowCounter;
+    private double _flowCounter;
     private int _volume;
     private bool _pourEnded;
 
     public readonly ConfigService ConfigService;
-    public int FlowCounter
+    public double FlowCounter
     {
         get => _flowCounter;
         set => this.RaiseAndSetIfChanged(ref _flowCounter, value);

@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 
 namespace BitChopp.Main.Views;
 
-using Avalonia.Threading;
 using Models;
 using Services;
 using ViewModels;
@@ -65,7 +65,10 @@ public partial class MainWindow : KioskBaseWindow
 
     private void OpenConfigurationWindow()
     {
-        var configWindow = new ConfigurationWindow(ConfigService);
-        configWindow.Show();
+        var configWindow = new ConfigurationWindow(ConfigService)
+        {
+            Topmost = true
+        };
+        configWindow.ShowDialog(this);
     }
 }

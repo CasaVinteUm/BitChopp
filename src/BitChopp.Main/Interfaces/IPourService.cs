@@ -2,8 +2,8 @@ namespace BitChopp.Main.Interfaces;
 
 public interface IPourService
 {
-    int FlowCounter { get; }
-    event EventHandler<int>? FlowCounterUpdated;
+    double FlowCounter { get; }
+    event EventHandler<double>? FlowCounterUpdated;
     event EventHandler<bool>? PourEnded;
 
     void PourExactly(int milliliters);

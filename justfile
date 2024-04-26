@@ -14,12 +14,23 @@ publish:
         -p:PublishSingleFile=true \
         -p:IncludeNativeLibrariesForSelfExtract=true
 
+# Builds the DEBUG executable
+publish-debug:
+    dotnet clean
+    dotnet publish -c Debug -r linux-arm --self-contained true \
+        -p:PublishReadyToRun=true \
+        -p:PublishSingleFile=true \
+        -p:IncludeNativeLibrariesForSelfExtract=true
+
 # Add key variable to enable using non-default key to connect to the RPI
 key := ""
 
 # Build and copy to the RPI
 deploy:
     rsync -avz -e "$(test -n "{{key}}" && echo "ssh -i {{key}}" || echo "ssh")" --progress src/BitChopp.Main/bin/Release/net8.0/linux-arm/publish/* pi@casa21chopp.local:/home/pi/BitChopp
+
+deploy-debug:
+    rsync -avz -e "$(test -n "{{key}}" && echo "ssh -i {{key}}" || echo "ssh")" --progress src/BitChopp.Main/bin/Debug/net8.0/linux-arm/publish/* pi@casa21chopp.local:/home/pi/BitChopp
 
 # Runs the app on the RPI
 run-remote:

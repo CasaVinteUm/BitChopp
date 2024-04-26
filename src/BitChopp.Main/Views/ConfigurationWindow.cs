@@ -5,7 +5,6 @@ using Avalonia.Threading;
 
 namespace BitChopp.Main.Views;
 
-using System.Timers;
 using Interfaces;
 using Services;
 
@@ -20,10 +19,10 @@ public class ConfigurationWindow : KioskBaseWindow
     private Button? _openValveButton;
     private Button? _closeValveButton;
     private TextBlock? _flowCounterTextBlock;
-    private int _initialFlowCount;
+    private double _initialFlowCount;
 
-    private readonly Timer _updateTimer;
-    private int _latestFlowCount;
+    private readonly System.Timers.Timer _updateTimer;
+    private double _latestFlowCount;
     private bool _updatePending = false;
 
     public ConfigurationWindow(ConfigService configService) : base(configService)
@@ -39,7 +38,7 @@ public class ConfigurationWindow : KioskBaseWindow
 
         _pourService.FlowCounterUpdated += PourService_FlowCounterUpdated;
 
-        _updateTimer = new Timer(TimeSpan.FromSeconds(2)); // Sets the interval to 1000 milliseconds (1 second)
+        _updateTimer = new System.Timers.Timer(TimeSpan.FromSeconds(2)); // Sets the interval to 1000 milliseconds (1 second)
         _updateTimer.Elapsed += UpdateTimer_Elapsed;
         _updateTimer.Start();
 
@@ -104,7 +103,7 @@ public class ConfigurationWindow : KioskBaseWindow
         return 50; // Assume 100 ml was poured for this example
     }
 
-    private void PourService_FlowCounterUpdated(object? sender, int e)
+    private void PourService_FlowCounterUpdated(object? sender, double e)
     {
         _latestFlowCount = e; // Update the latest flow count
         if (!_updatePending)
@@ -113,7 +112,7 @@ public class ConfigurationWindow : KioskBaseWindow
         }
     }
 
-    private void UpdateTimer_Elapsed(object? sender, ElapsedEventArgs e)
+    private void UpdateTimer_Elapsed(object? sender, object e)
     {
         if (_updatePending)
         {

@@ -1,8 +1,8 @@
 using Avalonia.Threading;
+using ReactiveUI;
 
 namespace BitChopp.Main.Views;
 
-using ReactiveUI;
 using Services;
 using ViewModels;
 
@@ -26,7 +26,8 @@ public partial class SuccessWindow : KioskBaseWindow
 #pragma warning restore CS8625
     public SuccessWindow(SuccessViewModel viewModel) : base(viewModel.ConfigService)
     {
-        InitializeComponent();
+        Console.WriteLine("SuccessWindow constructor");
+
         DataContext = viewModel;
         _viewModel = viewModel;
 
@@ -43,17 +44,39 @@ public partial class SuccessWindow : KioskBaseWindow
         {
             _countDownTimer.Dispose();
         };
+
+        InitializeComponent();
+
+        HandleViewModelUpdates();
     }
 
     private void HandleViewModelUpdates()
     {
-        if (_viewModel.PourEnded)
+        Console.WriteLine("HandleViewModelUpdates");
+        try
         {
-            ShowCheers();
+            if (_viewModel.PourEnded)
+            {
+                Console.WriteLine("Success:PourEnded");
+                ShowCheers();
+            }
+
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                try
+                {
+                    _pouringTipsService.UpdateTipByVolume(tipTextBlock, _viewModel.FlowCounter);
+                }
+                catch
+                {
+                    // Ignore
+                }
+            });
         }
-        else if (_viewModel.FlowCounter > 0)
+        catch (Exception ex)
         {
-            _pouringTipsService.UpdateTipByVolume(tipTextBlock, _viewModel.FlowCounter);
+            Console.Error.WriteLine(ex.Message);
+            Console.Error.WriteLine(ex.StackTrace);
         }
     }
 
@@ -83,6 +106,7 @@ public partial class SuccessWindow : KioskBaseWindow
 
     private void ShowCheers()
     {
+        Console.WriteLine("ShowCheers");
         _timerMessage = "Fechando em {0} segundos...";
         _timeLeft = 5;
         _ = new DispatcherTimer(TimeSpan.FromSeconds(5), DispatcherPriority.Normal, (sender, e) =>
@@ -104,5 +128,10 @@ public partial class SuccessWindow : KioskBaseWindow
                 // Ignore
             }
         });
+    }
+
+    ~SuccessWindow()
+    {
+        Console.WriteLine("SuccessWindow destructor");
     }
 }

@@ -15,6 +15,26 @@
         "debug"
       ],
       "cwd": "${workspaceFolder}",
-    }
+    },
+    {
+      "name": ".NET Remote Launch - Self-contained",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "~/BitChopp/BitChopp.Main",
+      "args": [],
+      "cwd": "~/BitChopp/",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "pipeTransport": {
+        "pipeCwd": "${workspaceRoot}",
+        "pipeProgram": "ssh",
+        "pipeArgs": [
+          "-i",
+          "~/.ssh/id_ngoline",
+          "pi@casa21chopp.local"
+        ],
+        "debuggerPath": "~/vsdbg/vsdbg"
+      }
+    },
   ]
 }
