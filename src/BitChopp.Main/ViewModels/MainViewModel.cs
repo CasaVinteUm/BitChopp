@@ -83,12 +83,27 @@ public partial class MainViewModel : ReactiveObject
         var volume = ExtractVolume(swObj.Switch.Description);
         _successViewModel = new SuccessViewModel(volume, _configService);
 
+        _pourService.FlowCounterUpdated += (s, e) =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _successViewModel.FlowCounter = e;
+            });
+        };
+
+        _pourService.PourEnded += (s, e) =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _successViewModel.PourEnded = e;
+                Console.WriteLine("MainView:PourEnded event received");
+            });
+        };
+
         Console.WriteLine($"Pouring {volume} ml");
-        _ = Task.Run(() =>
+        _ = Dispatcher.UIThread.InvokeAsync(() =>
         {
             _pourService.PourExactly(volume);
-            _pourService.FlowCounterUpdated += (s, e) => _successViewModel.FlowCounter = e;
-            _pourService.PourEnded += (s, e) => _successViewModel.PourEnded = e;
         });
 
         Console.WriteLine("Showing success window");
@@ -106,7 +121,7 @@ public partial class MainViewModel : ReactiveObject
     {
         IsLoading = true;
 
-        var lnUrlPosDevices = (await apiService.FetchLnurlPos()) ?? throw new Exception("Failed to fetch data");
+        var lnUrlPosDevices = await apiService.FetchLnurlPos() ?? throw new Exception("Failed to fetch data");
 
         if (lnUrlPosDevices.Count == 0)
         {

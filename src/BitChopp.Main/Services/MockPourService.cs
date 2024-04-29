@@ -1,5 +1,6 @@
 namespace BitChopp.Main.Services;
 
+using Avalonia.Threading;
 using Interfaces;
 
 public class MockPourService : IPourService
@@ -25,16 +26,16 @@ public class MockPourService : IPourService
 
         OpenValve();
 
-        for (var i = 0; i < milliliters; i++)
+        while (FlowCounter < milliliters)
         {
             FlowCounter++;
-            FlowCounterUpdated?.Invoke(this, FlowCounter);
+            _ = Dispatcher.UIThread.InvokeAsync(() => FlowCounterUpdated?.Invoke(this, FlowCounter));
             await Task.Delay(50); // Simulate flow increment delay
         }
 
         CloseValve();
 
-        PourEnded?.Invoke(this, true);
+        _ = Dispatcher.UIThread.InvokeAsync(() => PourEnded?.Invoke(this, true));
     }
 
     public void CleanIO()
@@ -61,7 +62,7 @@ public class MockPourService : IPourService
         if (_isValveOpen)
         {
             FlowCounter++;
-            FlowCounterUpdated?.Invoke(this, FlowCounter);
+            Dispatcher.UIThread.InvokeAsync(() => FlowCounterUpdated?.Invoke(this, FlowCounter));
         }
     }
 }

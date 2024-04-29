@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="BitChopp.Main.Views.ConfigurationWindow"
+        Title="BitChopp - Casa21 - Configuration">
+  <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+    <TextBlock Text="Pulses per ml:" FontSize="20" Margin="0,0,0,20"/>
+    <TextBox x:Name="PulsesPerMlTextBox" Width="200" Margin="0,0,20,20"/>
+    <TextBlock Text="Flow Counter:" FontSize="20" Margin="0,0,0,20"/>
+    <TextBlock x:Name="FlowCounterTextBlock" Width="200" Margin="0,0,20,20"/>
+    <Button Content="Open Valve" Click="OpenValveButton_Click"/>
+    <Button Content="Close Valve" Click="CloseValveButton_Click"/>
+    <Button Content="Save" Click="SaveButton_Click"/>
+    <Button Content="Close" Click="CloseButton_Click"/>
+  </StackPanel>
+</Window>

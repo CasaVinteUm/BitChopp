@@ -2,6 +2,7 @@ using System.Device.Gpio;
 
 namespace BitChopp.Main.Services;
 
+using Avalonia.Threading;
 using Interfaces;
 
 public class PourService : IPourService
@@ -42,14 +43,26 @@ public class PourService : IPourService
 
         while (FlowCounter < milliliters)
         {
+            if (milliliters - FlowCounter < 10)
+            {
+                _ = Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    PourEnded?.Invoke(this, true);
+                    Console.WriteLine("Pour:PourEnded");
+                });
+            }
             await Task.Yield();
         }
 
-        Console.WriteLine("PourEnded");
+        _ = Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            PourEnded?.Invoke(this, true);
+            Console.WriteLine("Pour:PourEnded");
+        });
 
         CloseValve();
 
-        PourEnded?.Invoke(this, true);
+        Console.WriteLine("PourEnded");
     }
 
     public void OpenValve()
@@ -85,7 +98,7 @@ public class PourService : IPourService
         {
             FlowCounter += 1D / _configService.PulsesPerMl();
             Console.WriteLine("HandleFlow:FlowCounter: {0}", FlowCounter);
-            Task.Run(() => { FlowCounterUpdated?.Invoke(this, FlowCounter); });
+            Dispatcher.UIThread.InvokeAsync(() => FlowCounterUpdated?.Invoke(this, FlowCounter));
         }
     }
 

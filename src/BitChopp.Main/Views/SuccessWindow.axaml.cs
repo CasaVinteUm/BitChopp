@@ -36,6 +36,7 @@ public partial class SuccessWindow : KioskBaseWindow
 
         Activated += (sender, e) =>
         {
+            _isOpen = false;
             this.WhenAnyValue(x => x._viewModel.PourEnded, x => x._viewModel.FlowCounter)
                 .Subscribe(_ => HandleViewModelUpdates());
         };
@@ -50,6 +51,8 @@ public partial class SuccessWindow : KioskBaseWindow
         HandleViewModelUpdates();
     }
 
+    private bool _isOpen;
+
     private void HandleViewModelUpdates()
     {
         Console.WriteLine("HandleViewModelUpdates");
@@ -58,20 +61,26 @@ public partial class SuccessWindow : KioskBaseWindow
             if (_viewModel.PourEnded)
             {
                 Console.WriteLine("Success:PourEnded");
-                ShowCheers();
+                if (!_isOpen)
+                {
+                    _isOpen = true;
+                    ShowCheers();
+                }
             }
-
-            Dispatcher.UIThread.InvokeAsync(() =>
+            else
             {
-                try
+                Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    _pouringTipsService.UpdateTipByVolume(tipTextBlock, _viewModel.FlowCounter);
-                }
-                catch
-                {
-                    // Ignore
-                }
-            });
+                    try
+                    {
+                        _pouringTipsService.UpdateTipByVolume(tipTextBlock, _viewModel.FlowCounter);
+                    }
+                    catch
+                    {
+                        // Ignore
+                    }
+                });
+            }
         }
         catch (Exception ex)
         {

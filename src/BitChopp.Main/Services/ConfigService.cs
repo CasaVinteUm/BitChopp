@@ -49,8 +49,8 @@ public class ConfigService(IConfiguration configuration)
         return int.Parse(_configuration["FlowSensorPin"] ?? "11");
     }
 
-    public int PulsesPerMl()
+    public double PulsesPerMl()
     {
-        return int.Parse(_configuration["PulsesPerMl"] ?? "6");
+        return double.Parse(_configuration["PulsesPerMl"] ?? "5.5");
     }
 }
