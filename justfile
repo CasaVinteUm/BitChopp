@@ -7,9 +7,17 @@ build:
     dotnet build
 
 # Builds the release executable
-publish:
+publish CONFIG="Release":
     dotnet clean
-    dotnet publish -c Release -r linux-arm --self-contained true \
+    dotnet publish -c {{CONFIG}} -r linux-arm --self-contained true \
+        -p:PublishReadyToRun=true \
+        -p:PublishSingleFile=true \
+        -p:IncludeNativeLibrariesForSelfExtract=true
+
+# Builds the DEBUG executable
+publish-debug:
+    dotnet clean
+    dotnet publish -c Debug -r linux-arm --self-contained true \
         -p:PublishReadyToRun=true \
         -p:PublishSingleFile=true \
         -p:IncludeNativeLibrariesForSelfExtract=true
@@ -18,8 +26,8 @@ publish:
 key := ""
 
 # Build and copy to the RPI
-deploy:
-    rsync -avz -e "$(test -n "{{key}}" && echo "ssh -i {{key}}" || echo "ssh")" --progress src/BitChopp.Main/bin/Release/net8.0/linux-arm/publish/* pi@casa21chopp.local:/home/pi/BitChopp
+deploy CONFIG="Release":
+    rsync -avz -e "$(test -n "{{key}}" && echo "ssh -i {{key}}" || echo "ssh")" --progress src/BitChopp.Main/bin/{{CONFIG}}/net8.0/linux-arm/publish/* pi@casa21chopp.local:/home/pi/BitChopp
 
 # Runs the app on the RPI
 run-remote:

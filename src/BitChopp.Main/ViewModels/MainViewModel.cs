@@ -2,11 +2,13 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
 
 namespace BitChopp.Main.ViewModels;
 
+using Interfaces;
 using Models;
 using Services;
 using Views;
@@ -17,8 +19,10 @@ public partial class MainViewModel : ReactiveObject
     private static partial Regex VolumeRegex();
 
     private readonly ConfigService _configService;
+    private readonly IPourService _pourService;
 
     private bool _isLoading;
+    private SuccessViewModel? _successViewModel;
 
     public readonly string DeviceId;
 
@@ -36,7 +40,17 @@ public partial class MainViewModel : ReactiveObject
 
         DeviceId = configService.GetSwitchId();
         _ = LoadSwitchesAsync(apiService);
+
         _configService = configService;
+
+        if (!_configService.IsDebug())
+        {
+            _pourService = new PourService(configService);
+        }
+        else
+        {
+            _pourService = new MockPourService();
+        }
     }
 
     private async void OnSwitchSelected(SwitchCommandObject swObj)
@@ -59,24 +73,55 @@ public partial class MainViewModel : ReactiveObject
         {
             await ShowSuccessWindow(swObj);
         }
+
+        qrWindow.Close();
+        qrWindow = null;
     }
 
     private async Task ShowSuccessWindow(SwitchCommandObject swObj)
     {
         var volume = ExtractVolume(swObj.Switch.Description);
+        _successViewModel = new SuccessViewModel(volume, _configService);
 
-        var successWindow = new SuccessWindow(volume, _configService)
+        _pourService.FlowCounterUpdated += (s, e) =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _successViewModel.FlowCounter = e;
+            });
+        };
+
+        _pourService.PourEnded += (s, e) =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _successViewModel.PourEnded = e;
+                Console.WriteLine("MainView:PourEnded event received");
+            });
+        };
+
+        Console.WriteLine($"Pouring {volume} ml");
+        _ = Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            _pourService.PourExactly(volume);
+        });
+
+        Console.WriteLine("Showing success window");
+        var successWindow = new SuccessWindow(_successViewModel)
         {
             Topmost = true
         };
         await successWindow.ShowDialog(swObj.Window);
+        Console.WriteLine("Success window closed");
+        successWindow.Close();
+        successWindow = null;
     }
 
     private async Task LoadSwitchesAsync(ApiService apiService)
     {
         IsLoading = true;
 
-        var lnUrlPosDevices = (await apiService.FetchLnurlPos()) ?? throw new Exception("Failed to fetch data");
+        var lnUrlPosDevices = await apiService.FetchLnurlPos() ?? throw new Exception("Failed to fetch data");
 
         if (lnUrlPosDevices.Count == 0)
         {
@@ -120,7 +165,7 @@ public partial class MainViewModel : ReactiveObject
     private void UpdateUI(List<LnUrlPosSwitch> switches)
     {
         // Ensure UI updates happen on the UI thread
-        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+        Dispatcher.UIThread.InvokeAsync(() =>
         {
             Switches.Clear();
             Switches.AddRange([.. switches.OrderBy(x => x.Amount)]);

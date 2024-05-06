@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 
 namespace BitChopp.Main.Services;
+
 public class PouringTipsService(int maxVolume)
 {
     private const string TipStart = "Puxe a alavanca para começar a servir.";
@@ -19,7 +20,7 @@ public class PouringTipsService(int maxVolume)
     private string _currentTip = TipStart;
 
     // Call this method whenever there's an update from the sensor
-    public void UpdateTipByVolume(TextBlock textBlock, int volume)
+    public void UpdateTipByVolume(TextBlock textBlock, double volume)
     {
         var lastTip = _currentTip;
 
