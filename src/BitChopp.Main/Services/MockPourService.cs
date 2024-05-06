@@ -65,4 +65,9 @@ public class MockPourService : IPourService
             Dispatcher.UIThread.InvokeAsync(() => FlowCounterUpdated?.Invoke(this, FlowCounter));
         }
     }
+
+    public void Dispose()
+    {
+        // Do nothing, it's a mock service
+    }
 }

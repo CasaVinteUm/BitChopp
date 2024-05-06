@@ -85,7 +85,7 @@ public class PourService : IPourService
         }
     }
 
-    public void CleanIO()
+    private void CleanIO()
     {
         _gpioController.ClosePin(_valvePin);
         _gpioController.ClosePin(_flowSensorPin);
@@ -102,8 +102,33 @@ public class PourService : IPourService
         }
     }
 
+    #region Dispose Pattern
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            CleanIO();
+        }
+
+        _disposed = true;
+    }
+
     ~PourService()
     {
         CleanIO();
     }
+    #endregion
 }

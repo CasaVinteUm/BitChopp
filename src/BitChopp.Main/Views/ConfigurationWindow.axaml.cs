@@ -83,17 +83,6 @@ public partial class ConfigurationWindow : KioskBaseWindow
         }
     }
 
-    private void SaveButton_Click(object sender, RoutedEventArgs e)
-    {
-        var settings = new
-        {
-            PulsesPerMl = PulsesPerMlTextBox.Text
-        };
-
-        // File.WriteAllText("appsettings.json", JsonConverter.SerializeObject(settings));
-        Close();
-    }
-
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();

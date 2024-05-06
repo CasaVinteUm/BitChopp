@@ -1,6 +1,6 @@
 namespace BitChopp.Main.Interfaces;
 
-public interface IPourService
+public interface IPourService : IDisposable
 {
     double FlowCounter { get; }
     event EventHandler<double>? FlowCounterUpdated;
@@ -9,5 +9,4 @@ public interface IPourService
     void PourExactly(int milliliters);
     public void OpenValve();
     public void CloseValve();
-    public void CleanIO();
 }
